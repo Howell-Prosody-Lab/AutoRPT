@@ -63,11 +63,11 @@ class FileProcessorIntensity:
         self.ie = IntensityExtraction()
 
     
-    def iterateTextGridforIntensity(self, TextGrid_path, tier_name, Wav_file):
+    def iterateTextGridforIntensity(self, s):
         """
         Creates array Interval_data, iterates through intervals of specified TextGrid tier, and runs
         calculations. Calls all IntensityExtraction functions.
-        Args: TextGrid_path: str, tier_name: str, Wav_file: parselmouth.Sound object.
+        Args: SpeakerFile object s
         Returns: dict interval_data, int error_count, and array error_arr. 
         """
         error_count = 0
@@ -76,7 +76,7 @@ class FileProcessorIntensity:
         interval_data = {"Interval":[],"Text":[], "min":[], "max":[], "mean":[], "Std":[], "z-score":[], "start":[], "end":[], "STD":[], "Z-SCORE":[], "dur":[]}
     
         #Load the TextGrid using tgt
-        tgt_text_grid = tgt.io.read_textgrid(TextGrid_path)
+        #tgt_text_grid = tgt.io.read_textgrid(TextGrid_path)
     
         average_sum = 0
         count = 0
@@ -84,13 +84,13 @@ class FileProcessorIntensity:
 
         #Get the specified tier
         tier = None
-        for t in tgt_text_grid.tiers:
-            if t.name == tier_name:
+        for t in s.textgrid_obj.tiers:
+            if t.name==(s.word_tier):
                 tier = t
                 break
 
         if tier is None:
-            print(f"Tier '{tier_name}' not found in the TextGrid.")
+            print(f"Tier '{s.word_tier}' not found in the TextGrid.")
             return
 
         #Iterate through intervals on the tier
@@ -100,15 +100,14 @@ class FileProcessorIntensity:
             interval_text = interval.text
             #print("start time:", start_time, ", end time:", end_time, ", text:", interval_text)
             
-            if interval_text[0] == "{":
+            if interval_text[0]== "{" or interval_text[0]== "[":
                 pass
             else:
-                
-                
+                              
                 try:
             
                 #Calculate Intensity of the interval
-                    initial_intensity = self.ie.getIntensity(Wav_file, start_time, end_time)
+                    initial_intensity = self.ie.getIntensity(s.wav_file_obj, start_time, end_time)
         
                 #Calculate the pitch standard deviation for the interval
                     intensity_std_dev = self.ie.getSTDIntensity(initial_intensity)
@@ -529,13 +528,14 @@ import tgt
 import numpy as np
 import datetime
 import os
+from Utilities import *
 
 
 class Intensity:
     
-    def run(tier_name, Textgrid_path, Wav_file_path):
+    def run(s, csv_path):
         # Creates Sound object, does calculations on data, and exports the resulting dict.
-        # Args: tier_name: str, Textgrid_path: str[path], Wav_file_path: str[path]
+        # Args: s: SpeakerFile object, csv_path: str[path]
         # Returns: dict final_intensity_data
         
         #Work Environment
@@ -548,16 +548,17 @@ class Intensity:
         pos = POS()
         sm = Saved_Model()
 
-        wav_file_name = os.path.basename(Wav_file_path)
-        wav_file_name_woe = os.path.splitext(wav_file_name)[0]
-        wav_to_csv = wav_file_name_woe + "_Intensity.csv"
-        current_path = os.getcwd()
-        csv_path = os.path.join(current_path, "CSV_output")
+        #wav_file_name = s.wav_filename
+        #wav_file_name_woe = os.path.splitext(wav_file_name)[0]
+        wav_to_csv = s.name_with_channel + "_Intensity.csv"
+        #current_path = os.getcwd()
+        #csv_path = os.path.join(current_path, "CSV_output")
+        #csv_path = os.path.join(os.path.dirname(save_path), "CSV_output")
         csv_file = os.path.join(csv_path, wav_to_csv)
 
-        Wav_file = parselmouth.Sound(Wav_file_path)
+        #Wav_file = parselmouth.Sound(s.wav_filepath)
             
-        data, error, error_arr = fpi.iterateTextGridforIntensity(Textgrid_path, tier_name, Wav_file)
+        data, error, error_arr = fpi.iterateTextGridforIntensity(s)
 
         file_mean = spn.fileMean(data, "max")
         file_std = spn.fileStd(data, file_mean, "max")
@@ -571,7 +572,7 @@ class Intensity:
 
         #print("\n")
 
-        ifo.to_csv(tier_arrays, csv_file)
+        mto_csv(tier_arrays, csv_file)
 
         pos.add_pos_column_with_pandas(csv_file, text_column_name = "Text", new_column_name="POS ID's")
         pos.clean_column(csv_file)
