@@ -80,52 +80,7 @@ class model_join:
         #print("total_max =",total_max)
         #print(p_intervals)
         #print(i_intervals)
-        '''
-        j = 1
-        pitch = 0
-        intensity = 0
-
-        def coalesce(dicts, overall_index, column):
-            for arg in dicts:
-                if overall_index in arg["Interval"]:
-                    local_index = arg["Interval"].index(overall_index)
-                    return arg[column][local_index]
-                else:
-                    return None
-        def find(arg, overall_index, column):
-            if overall_index in arg["Interval"]:
-                local_index = arg["Interval"].index(overall_index)
-                return arg[column][local_index]
-            else:
-                return None
-        dicts = [p_dict, i_dict]
-        test_dict = {
-            "Interval": [],            
-            "Text": [],
-            "Pitch_prominence": [],
-            "Intensity_prominence": [],
-            "Prominence": [],
-            "Pitch_boundary": [],
-            "Intensity_boundary": [],
-            "Silence_boundary": [],
-            "Boundary": [],
-            "start": [],
-            "end": [],
-            "next_start": [],
-            "pitch_interval": [],
-            "intensity_interval": [],
-            "Prominence_label": [],
-            "Boundary_label" : []
-        }
-        while j < total_max:
-            test_dict["Interval"].append(coalesce(dicts, j, "Interval"))
-            test_dict["Text"].append(coalesce(dicts, j, "Text"))
-            test_dict["start"].append(coalesce(dicts, j, "start"))
-            test_dict["end"].append(coalesce(dicts, j, "end"))
-            test_dict["Pitch_prominence"].append(find(p_dict, j, "Prominence_raw"))
-            test_dict["Intensity_boundary"].append(find(i_dict, j, "Boundary_raw"))
-        mto_csv(mdictToArr(test_dict),os.getcwd())
-        '''                                 
+                               
         j = 1
         pitch = 0
         intensity = 0
