@@ -21,7 +21,7 @@ import Utilities
 from Utilities import *
 from Clean_P_Model import Pitch
 from Clean_I_Model import Intensity
-import sliceUtterances
+
 
 class SpeakerFile:
     def __init__(self, wav_filepath, textgrid_filepath):
@@ -345,6 +345,7 @@ def main(s, save_path = None, split_utterances=False):
     mto_csv(data=printable,csv_file=filepath)
 
     if split_utterances:
+        import sliceUtterances
         print("Splitting utterances...")
         sliced_save_path = os.path.join(save_path, "sliced-utterance-output", s.variety)
         sliceUtterances.just_one_moneypenney(s.wav_filepath, s.textgrid_filepath,
