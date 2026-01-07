@@ -358,8 +358,8 @@ if __name__ == "__main__":
     Only one of these two should be uncommented at a time. See descriptions of methods to pick one.
     """
     #speaker_file = select_files()
-    #speaker_file, save_path = pull_files_from_path()
+    speaker_file, save_path = pull_files_from_path()
 
     """Only one of these two should be uncommented at a time."""
-    #if speaker_file: main(speaker_file, save_path=save_path)
-    batch_process()
+    if speaker_file: main(speaker_file, save_path=save_path)
+    #batch_process()
