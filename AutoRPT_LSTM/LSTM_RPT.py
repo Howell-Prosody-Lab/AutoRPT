@@ -246,7 +246,7 @@ def pull_files_from_path():
         return None, None, None
     
     filename = wav_file_path.split('/')[-1]
-    filename_stripped = filename[0:-6]
+    filename_stripped = filename[0:filename.rfind('_')]
     textgrid_path = os.path.join(gen_textgrid_path,(filename_stripped + ".TextGrid"))
     speaker_file = SpeakerFile(wav_file_path, textgrid_path)
     #print (textgrid_path)
