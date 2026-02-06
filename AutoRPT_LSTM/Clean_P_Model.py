@@ -579,7 +579,7 @@ class Pitch:
         wav_to_csv = s.name_with_channel + "_Pitch_Phones.csv"
         csv_file = os.path.join(csv_path, wav_to_csv)
 
-        data, error, error_arr = fpi.iterateTextGridforIntensity(s, 'phone')
+        data, error, error_arr = fp.iterateTextGridforPitch(s, 'phone')
 
         file_mean = spn.fileMean(data, "max")
         file_std = spn.fileStd(data, file_mean, "max")
@@ -589,7 +589,7 @@ class Pitch:
 
         full_complete_data = cx.contextWindow(complete_data)
 
-        tier_arrays = ifti.dictToArr(full_complete_data)
+        tier_arrays = fti.dictToArr(full_complete_data)
 
         #print("\n")
 
