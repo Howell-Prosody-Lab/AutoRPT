@@ -143,9 +143,9 @@ class FileProcessor:
         self.pe = PitchExtraction()
 
     
-    def iterateTextGridforPitch(self, s):
+    def iterateTextGridforPitch(self, s, tier_type = 'word'):
         # Creates array Interval_data, iterates through intervals of specified TextGrid tier, and runs calculations.
-        # Args: s: SpeakerFile object
+        # Args: SpeakerFile object s, str tier_type ('word' or 'phone')
         # Returns: array interval_data, int error_count, and array error_arr
     
         error_count = 0
@@ -162,9 +162,10 @@ class FileProcessor:
         dict_iterable = 0
 
         #Get the specified tier
+        tier_name = s.word_tier if tier_type == 'word' else s.phone_tier
         tier = None
-        for t in s.textgrid_obj:
-            if t.name == s.word_tier:
+        for t in s.textgrid_obj.tiers:
+            if t.name==(tier_name): #if this line looks confusing, refer to the line before tier = None
                 tier = t
                 break
 
@@ -570,6 +571,29 @@ class Pitch:
         final_pitch_data = sm.pitch_model(csv_file, full_complete_data)
 
         #print(final_pitch_data)
+
+        #################
+        #PHONE TIER TIME#
+        #################
+
+        wav_to_csv = s.name_with_channel + "_Pitch_Phones.csv"
+        csv_file = os.path.join(csv_path, wav_to_csv)
+
+        data, error, error_arr = fp.iterateTextGridforPitch(s, 'phone')
+
+        file_mean = spn.fileMean(data, "max")
+        file_std = spn.fileStd(data, file_mean, "max")
+        file_min = spn.fileMin(data, "min")
+        file_max = spn.fileMax(data, "max")
+        complete_data = spn.zScoreAppend(data, file_mean, file_std, "max")
+
+        full_complete_data = cx.contextWindow(complete_data)
+
+        tier_arrays = fti.dictToArr(full_complete_data)
+
+        #print("\n")
+
+        mto_csv(tier_arrays, csv_file)
 
         return final_pitch_data
 

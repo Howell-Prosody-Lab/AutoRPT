@@ -63,11 +63,11 @@ class FileProcessorIntensity:
         self.ie = IntensityExtraction()
 
     
-    def iterateTextGridforIntensity(self, s):
+    def iterateTextGridforIntensity(self, s, tier_type = 'word'):
         """
         Creates array Interval_data, iterates through intervals of specified TextGrid tier, and runs
         calculations. Calls all IntensityExtraction functions.
-        Args: SpeakerFile object s
+        Args: SpeakerFile object s, str tier_type ('word' or 'phone')
         Returns: dict interval_data, int error_count, and array error_arr. 
         """
         error_count = 0
@@ -83,14 +83,15 @@ class FileProcessorIntensity:
         dict_iterable = 0
 
         #Get the specified tier
+        tier_name = s.word_tier if tier_type == 'word' else s.phone_tier
         tier = None
         for t in s.textgrid_obj.tiers:
-            if t.name==(s.word_tier):
+            if t.name==(tier_name): #if this line looks confusing, refer to the line before tier = None
                 tier = t
                 break
 
         if tier is None:
-            print(f"Tier '{s.word_tier}' not found in the TextGrid.")
+            print(f"Tier '{tier_name}' not found in the TextGrid.")
             return
 
         #Iterate through intervals on the tier
@@ -109,12 +110,12 @@ class FileProcessorIntensity:
                 #Calculate Intensity of the interval
                     initial_intensity = self.ie.getIntensity(s.wav_file_obj, start_time, end_time)
         
-                #Calculate the pitch standard deviation for the interval
+                #Calculate the intensity standard deviation for the interval
                     intensity_std_dev = self.ie.getSTDIntensity(initial_intensity)
         
                     interval_data["Std"].append(intensity_std_dev)
         
-                #Calculate Max pitch of interval
+                #Calculate Max intensity of interval
                     high = self.ie.getMaxIntensity(initial_intensity)
         
                     interval_data["max"].append(high)
@@ -126,7 +127,7 @@ class FileProcessorIntensity:
                     
                     interval_data["dur"].append(dur)
         
-                #Calculate Min pitch of interval
+                #Calculate Min intensity of interval
                     low = self.ie.getMinIntensity(initial_intensity)
         
                     interval_data["min"].append(low)
@@ -137,7 +138,7 @@ class FileProcessorIntensity:
         
                     interval_data["Interval"].append(dict_iterable)
             
-                #get the average pitch of interval
+                #get the average intensity of interval
                     average = self.ie.getAverageIntensity(initial_intensity)
         
                     interval_data["mean"].append(average)
@@ -578,6 +579,30 @@ class Intensity:
         pos.clean_column(csv_file)
 
         final_intensity_data = sm.intensity_model(csv_file, full_complete_data)
+
+        #################
+        #PHONE TIER TIME#
+        #################
+
+        wav_to_csv = s.name_with_channel + "_Intensity_Phones.csv"
+        csv_file = os.path.join(csv_path, wav_to_csv)
+
+        data, error, error_arr = fpi.iterateTextGridforIntensity(s, 'phone')
+
+        file_mean = spn.fileMean(data, "max")
+        file_std = spn.fileStd(data, file_mean, "max")
+        file_min = spn.fileMin(data, "min")
+        file_max = spn.fileMax(data, "max")
+        complete_data = spn.zScoreAppend(data, file_mean, file_std, "max")
+
+        full_complete_data = cx.contextWindow(complete_data)
+
+        tier_arrays = ifti.dictToArr(full_complete_data)
+
+        #print("\n")
+
+        mto_csv(tier_arrays, csv_file)
+
 
         return final_intensity_data
 

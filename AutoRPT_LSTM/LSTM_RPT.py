@@ -28,8 +28,8 @@ class SpeakerFile:
         def case_manual_format():
             print("\nThis file name or tier name does not match a recognized format. Enter tiers manually.")                      
             word_tier, phone_tier = select_tiers(all_tiers)
-            return ("unknown", "unknown", "unknown", word_tier,
-                    phone_tier, "unknown", "unknown")
+            return ("unknown", "unknown", word_tier, phone_tier,
+                    "unknown", "unknown")
 
         format_recognized = True #true until proven false
 
