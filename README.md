@@ -81,15 +81,27 @@ The key dependencies for AutoRPT are:
 5. **PyTorch**: An open-source deep learning framework, used for building and training machine learning models.
 
 #### Model Pipeline
-Finally, install the model.
+Install the SpacY model pipeline.
 ```bash
 python -m spacy download en_core_web_sm
 ```
 
+### Step 3: Install the trained models
 
-### Step 3: Run AutoRPT
+We recommend that you use the most recent version of the trained models for LSTM, which can be found at [the top level of this repo](https://github.com/Howell-Prosody-Lab/rpt-training/tree/main) 
+1. Go to the AutoRPT-main/AutoRPT-main/AutoRPT_LSTM/Model_paths that is now on your computer.
+2. Delete the files out of it.
+3. Download the models from the provided link.
+4. Put them into that folder.
+5. Rename the models to Intensity_LSTM_model.h5 and Pitch_LSTM_model.h5.
+
+### Step 4: Run AutoRPT
 
 Choose whether you want to run the (RNN) AutoRPT or the AutoRPT_LSTM and navigate into that folder.
+e.g.
+```bash
+cd AutoRPT-main/AutoRPT-main/AutoRPT_LSTM
+```
 
 #### LSTM:
 You can then run AutoRPT with the following command:
