@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "praat-autorpt"
+version = "0.1.0"
+authors = [
+  { name="Seth Heiney", email="seth@montclair.edu" },
+  { name="Thomas Hicks", email="tom@montclair.edu" },
+  { name="Sally Little", email="littlek6@montclair.edu>" },
+  { name="Fernanda Lourenco", email="lourencodasf1@montclair.edu" },
+  { name="Kai Retana", email="retanamontek1@montclair.edu" },
+  { name="Eliana Stevens", email="stevense4@montclair.edu" },
+  { name="Jonathan Howell", email="howellj@montclair.edu" },
+]
+description = "Command-line tool for annotating prosodic features"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "praat-parselmouth>=0.3.3",
+    "textgrid>=1.5",
+    "scikit-learn>=1.5.2",
+    "pandas>=2.0.3",
+    "praatio>=6.2.0",
+    "tgt>=1.4.4",
+    "numpy>=1.26.4",
+    "spacy>=3.8.4",
+    "tensorflow>=2.15.0",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/Howell-Prosody-Lab/AutoRPT"
+
+[tool.setuptools.packages.find]
+include = ["AutoRPT_LSTM*"]
+
+[tool.setuptools.package-data]
+AutoRPT_LSTM = ["Model_paths/*.h5"]

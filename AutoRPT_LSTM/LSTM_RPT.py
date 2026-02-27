@@ -15,8 +15,8 @@ from praatio import textgrid
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-import Clean_I_Model
-import Clean_P_Model
+from . import Clean_I_Model
+from . import Clean_P_Model
 import Utilities
 from Utilities import *
 from Clean_P_Model import Pitch

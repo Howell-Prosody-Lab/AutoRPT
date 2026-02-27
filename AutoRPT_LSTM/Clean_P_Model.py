@@ -458,10 +458,8 @@ class Saved_Model:
         # Returns: pred_dict: dict
         
         # Load the trained model
-        working_dir = os.getcwd()
-        folder_name = "Model_paths"
-        folder_path = os.path.join(working_dir, folder_name)
-        model_save_path = os.path.join(folder_path, "Pitch_LSTM_model.h5")
+        package_dir = os.path.dirname(os.path.abspath(__file__))
+        model_save_path = os.path.join(package_dir, "Model_paths", "Pitch_LSTM_model.h5")
         # print(model_save_path)
         try:
             model = load_model(model_save_path)
