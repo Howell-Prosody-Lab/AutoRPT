@@ -17,14 +17,14 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from . import Clean_I_Model
 from . import Clean_P_Model
-import Utilities
-from Utilities import *
-from Clean_P_Model import Pitch
-from Clean_I_Model import Intensity
+from . import Utilities
+from .Utilities import *
+from .Clean_P_Model import Pitch
+from .Clean_I_Model import Intensity
 
 
 class SpeakerFile:
-    def __init__(self, wav_filepath, textgrid_filepath):
+    def __init__(self, wav_filepath, textgrid_filepath, word_tier=None, phone_tier=None):
         def case_manual_format():
             print("\nThis file name or tier name does not match a recognized format. Enter tiers manually.")                      
             word_tier, phone_tier = select_tiers(all_tiers)
@@ -69,14 +69,18 @@ class SpeakerFile:
         
         all_tiers = [t.name for t in self.textgrid_obj.tiers]
         
-        #fetch variables found in file naming convention
-        if self.name_with_channel[0:4]==("1213"):
-            sID, g, word_tier, phone_tier, pn, v = self.MMT1(self.name_with_channel)          
-        elif self.name_with_channel[0:4]==("3000"):
-            sID, g, word_tier, phone_tier, pn, v = self.MMT2(self.name_with_channel)            
+        if word_tier is not None and phone_tier is not None:
+            #tiers are manually provided
+            sID, g, pn, v = "unknown", "unknown", "unknown", "unknown"
         else:
-            format_recognized = False                       
-        if word_tier not in all_tiers or phone_tier not in all_tiers or not format_recognized:
+            #fetch variables found in file naming convention
+            if self.name_with_channel[0:4]==("1213"):
+                sID, g, word_tier, phone_tier, pn, v = self.MMT1(self.name_with_channel)
+            elif self.name_with_channel[0:4]==("3000"):
+                sID, g, word_tier, phone_tier, pn, v = self.MMT2(self.name_with_channel)
+            else:
+                format_recognized = False
+            if word_tier not in all_tiers or phone_tier not in all_tiers or not format_recognized:
                 sID, g, word_tier, phone_tier, pn, v = case_manual_format()
 
         #unpack output
@@ -356,10 +360,21 @@ def main(s, save_path = None, split_utterances=False):
 
 if __name__ == "__main__":
     """
-    Only one of these two should be uncommented at a time. See descriptions of methods to pick one.
+    Depending on the files available in the working directory or the arguments given, the speaker_file is generated in one of three ways.
     """
-    #speaker_file = select_files()
-    speaker_file, save_path = pull_files_from_path()
+    if len(sys.argv) >= 4:
+        # usage: LSTM_RPT.py <wav> <textgrid> <word_tier> [<phone_tier>]
+        wav_path = sys.argv[1]
+        textgrid_path = sys.argv[2]
+        word_tier = sys.argv[3]
+        phone_tier = sys.argv[4] if len(sys.argv) >= 5 else None
+        speaker_file = SpeakerFile(wav_path, textgrid_path, word_tier=word_tier, phone_tier=phone_tier)
+        save_path = None
+    elif (os.path.exists("pull_files_from_path.txt")):
+        speaker_file, save_path = pull_files_from_path()
+    else:
+        speaker_file = select_files()
+        save_path = None
 
     """Only one of these two should be uncommented at a time."""
     if speaker_file: main(speaker_file, save_path=save_path)

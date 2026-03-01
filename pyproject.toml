@@ -6,9 +6,9 @@ build-backend = "setuptools.build_meta"
 name = "praat-autorpt"
 version = "0.1.0"
 authors = [
-  { name="Seth Heiney", email="seth@montclair.edu" },
-  { name="Thomas Hicks", email="tom@montclair.edu" },
-  { name="Sally Little", email="littlek6@montclair.edu>" },
+  { name="Seth Heiney", email="sheiney00@gmail.com" },
+  { name="Thomas Hicks", email="hicksthomas465@gmail.com" },
+  { name="Sally Little", email="littlek6@montclair.edu" },
   { name="Fernanda Lourenco", email="lourencodasf1@montclair.edu" },
   { name="Kai Retana", email="retanamontek1@montclair.edu" },
   { name="Eliana Stevens", email="stevense4@montclair.edu" },
@@ -26,7 +26,7 @@ dependencies = [
     "tgt>=1.4.4",
     "numpy>=1.26.4",
     "spacy>=3.8.4",
-    "tensorflow>=2.15.0",
+    "tensorflow>=2.20.0",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -43,3 +43,6 @@ include = ["AutoRPT_LSTM*"]
 
 [tool.setuptools.package-data]
 AutoRPT_LSTM = ["Model_paths/*.h5"]
+
+[project.scripts]
+autorpt = "AutoRPT_LSTM.LSTM_RPT:main"
