@@ -358,10 +358,24 @@ def main(s, save_path = None, split_utterances=False):
 
     print("Operation complete.")
 
-if __name__ == "__main__":
+def cli():
+
+    if "help" in sys.argv:
+        print('''
+                Usage: autorpt <wav> <textgrid> <word_tier> [<phone_tier>]
+
+                Additional Flags: --batch (for batch processing of multiple files)
+                ''')
+
+    if "--batch" in sys.argv:
+        # usage: LSTM_RPT.py --batch
+        batch_process()
+        return
+
     """
     Depending on the files available in the working directory or the arguments given, the speaker_file is generated in one of three ways.
     """
+
     if len(sys.argv) >= 4:
         # usage: LSTM_RPT.py <wav> <textgrid> <word_tier> [<phone_tier>]
         wav_path = sys.argv[1]
@@ -379,3 +393,6 @@ if __name__ == "__main__":
     """Only one of these two should be uncommented at a time."""
     if speaker_file: main(speaker_file, save_path=save_path)
     #batch_process()
+
+if __name__ == "__main__":
+    cli()

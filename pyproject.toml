@@ -45,4 +45,4 @@ include = ["AutoRPT_LSTM*"]
 AutoRPT_LSTM = ["Model_paths/*.h5"]
 
 [project.scripts]
-autorpt = "AutoRPT_LSTM.LSTM_RPT:main"
+autorpt = "AutoRPT_LSTM.LSTM_RPT:cli"
