@@ -6,7 +6,7 @@ import pandas as pd
 
 class SpeakerFile:
 
-    def __init__(self, textgrid_file_path=None, finaldict_file_path=None, wav_file_path=None, annot_filepath=None, existing_file=None):
+    def __init__(self, textgrid_file_path=None, finaldict_file_path=None, wav_file_path=None, annot_filepath=None, existing_file=None, word_tier=None, phone_tier=None):
         '''
         Creates the SpeakerFile object using at least one of the keyword arguments. Extrapolates what other
         information is available from the files/file names and saves.
@@ -22,6 +22,10 @@ class SpeakerFile:
             self.file_version = "Regular"
             self.rpt_status = self.word_tier = self.word_tier_no = self.phone_tier = self.phone_tier_no = "Unknown"
             self.point_tier = self.point_tier_no = self.ideal_word_tier = self.ideal_phone_tier = "Unknown"
+            if word_tier:
+                self.word_tier = word_tier
+            if phone_tier:
+                self.phone_tier = phone_tier
             self.finaldict_filepath = self.final_dict = None
             self.annotations = self.annotator = self.annotations_filepath = None
             self.wav_filepath = self.textgrid_filepath = all_tiers = None
@@ -100,9 +104,15 @@ class SpeakerFile:
             else:
                 w_no = ph_no = word_tier = phone_tier = pt_no = point_tier = None
             if not format_recognized:
-                print("\nThis file name or tier name does not match a recognized format. Enter tiers manually.")
-                self.word_tier = input("Enter the word tier name in the TextGrid: ")
-                self.phone_tier = input("Enter the phone tier name in the TextGrid: ")
+                stem = os.path.splitext(os.path.basename(first_existing_path))[0]
+                self.base_filename = stem
+                self.name_with_channel = stem
+                self.name_with_channel_and_version = stem
+                if self.word_tier == "Unknown":
+                    print("\nThis file name or tier name does not match a recognized format. Enter tiers manually.")
+                    self.word_tier = input("Enter the word tier name in the TextGrid: ")
+                if self.phone_tier == "Unknown":
+                    self.phone_tier = input("Enter the phone tier name in the TextGrid: ")
 
 
     #Methods that are basically part of init
@@ -130,7 +140,9 @@ class SpeakerFile:
         '''
         print("Parsing tiers...")
         print(tiers)
-        if self.ideal_word_tier in tiers:
+        if self.word_tier not in ("Unknown", None) and self.word_tier in tiers:
+            pass  # already set from constructor argument; preserve it
+        elif self.ideal_word_tier in tiers:
             self.word_tier = self.ideal_word_tier
             self.rpt_status = "not AutoRPT"
         elif "Text" in tiers:
@@ -138,7 +150,9 @@ class SpeakerFile:
             self.rpt_status = "AutoRPT"
         else:
             self.word_tier = input(f"No word tier found (expecting {self.ideal_word_tier}). Enter word tier: ")
-        if self.ideal_phone_tier in tiers:
+        if self.phone_tier not in ("Unknown", None) and self.phone_tier in tiers:
+            pass  # already set from constructor argument; preserve it
+        elif self.ideal_phone_tier in tiers:
             self.phone_tier = self.ideal_phone_tier
         elif 'phone' in tiers:
             self.phone_tier = 'phone'

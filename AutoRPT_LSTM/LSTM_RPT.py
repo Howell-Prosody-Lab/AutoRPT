@@ -13,15 +13,16 @@ from praatio import textgrid
 
 #Add the current directory to sys.path
 import sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+#sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-import Clean_I_Model
-import Clean_P_Model
-import Utilities
-from SpeakerFile import *
-from Utilities import *
-from Clean_P_Model import Pitch
-from Clean_I_Model import Intensity
+#import .Clean_I_Model
+#import .Clean_P_Model
+#import .Utilities
+#import .SpeakerFile
+from .SpeakerFile import *
+from .Utilities import *
+from .Clean_P_Model import Pitch
+from .Clean_I_Model import Intensity
     
 
 def select_tiers(all_tiers):
@@ -214,13 +215,43 @@ def main(s, save_path = None, split_utterances=False):
 
     print("Operation complete.")
 
-if __name__ == "__main__":
-    """
-    Only one of these two should be uncommented at a time. See descriptions of methods to pick one.
-    """
-    #speaker_file = select_files()
-    speaker_file, save_path = pull_files_from_path()
+def cli():
+    save_path = None
 
-    """Only one of these two should be uncommented at a time."""
+    if "--help" in sys.argv:
+        print('''
+Usage: autorpt <wav> <textgrid> <word_tier> [<phone_tier>]
+
+Additional Flags:
+    --batch (for batch processing of multiple files)
+    --select (for manually selecting files/tiers with a file selector)
+
+You may also make a file 'pull_files_from_path.txt'. Running autorpt in the same directory as this file will pull arguments from this file instead of the command line.
+                ''')
+        return
+
+    if "--select" in sys.argv:
+        speaker_file = select_files()
+
+    elif "--batch" in sys.argv:
+        # usage: LSTM_RPT.py --batch
+        # see batch_process() method for more details
+        batch_process()
+        return
+
+    else:
+        pos_args = [a for a in sys.argv[1:] if not a.startswith('--')]
+        if len(pos_args) >= 3:
+            wav_path, tg_path, word_tier = pos_args[0], pos_args[1], pos_args[2]
+            phone_tier = pos_args[3] if len(pos_args) >= 4 else None
+            speaker_file = SpeakerFile(wav_file_path=wav_path, textgrid_file_path=tg_path,
+                                       word_tier=word_tier, phone_tier=phone_tier)
+        elif os.path.exists("pull_files_from_path.txt"):
+            speaker_file, save_path = pull_files_from_path()
+        else:
+            speaker_file = select_files()
+
     if speaker_file: main(speaker_file, save_path=save_path, split_utterances=True)
-    #batch_process()
+
+if __name__ == "__main__":
+    cli()
