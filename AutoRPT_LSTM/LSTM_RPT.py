@@ -206,7 +206,7 @@ def main(s, save_path = None, split_utterances=False):
     mto_csv(data=printable,csv_file=filepath)
 
     if split_utterances:
-        import sliceUtterances
+        from . import sliceUtterances
         print("Splitting utterances...")
         sliced_save_path = os.path.join(save_path, "sliced-utterance-output", s.variety)
         sliceUtterances.just_one_moneypenney(s.wav_filepath, s.textgrid_filepath,
@@ -216,42 +216,44 @@ def main(s, save_path = None, split_utterances=False):
     print("Operation complete.")
 
 def cli():
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        prog='autorpt',
+        description='AutoRPT LSTM - Automatic Rapid Prosody Transcription',
+        epilog='You may also create a file "pull_files_from_path.txt" to pull arguments from instead of the command line.'
+    )
+
+    parser.add_argument('wav', nargs='?', help='Path to the WAV file')
+    parser.add_argument('textgrid', nargs='?', help='Path to the TextGrid file')
+    parser.add_argument('word_tier', nargs='?', default=None, help='Name of the word tier (optional, will prompt if not provided)')
+    parser.add_argument('phone_tier', nargs='?', default=None, help='Name of the phone tier (optional, will prompt if not provided)')
+
+    parser.add_argument('--batch', action='store_true', help='Batch process multiple files')
+    parser.add_argument('--select', action='store_true', help='Manually select files/tiers with a file selector')
+    parser.add_argument('--slice', action='store_true', help='Apply utterance slicing with ffmpeg')
+
+    args = parser.parse_args()
+
     save_path = None
+    speaker_file = None
 
-    if "--help" in sys.argv:
-        print('''
-Usage: autorpt <wav> <textgrid> <word_tier> [<phone_tier>]
-
-Additional Flags:
-    --batch (for batch processing of multiple files)
-    --select (for manually selecting files/tiers with a file selector)
-
-You may also make a file 'pull_files_from_path.txt'. Running autorpt in the same directory as this file will pull arguments from this file instead of the command line.
-                ''')
-        return
-
-    if "--select" in sys.argv:
-        speaker_file = select_files()
-
-    elif "--batch" in sys.argv:
-        # usage: LSTM_RPT.py --batch
-        # see batch_process() method for more details
+    if args.batch:
         batch_process()
         return
 
+    if args.select:
+        speaker_file = select_files()
+    elif args.wav and args.textgrid:
+        speaker_file = SpeakerFile(wav_file_path=args.wav, textgrid_file_path=args.textgrid,
+                                   word_tier=args.word_tier, phone_tier=args.phone_tier)
+    elif os.path.exists("pull_files_from_path.txt"):
+        speaker_file, save_path = pull_files_from_path()
     else:
-        pos_args = [a for a in sys.argv[1:] if not a.startswith('--')]
-        if len(pos_args) >= 3:
-            wav_path, tg_path, word_tier = pos_args[0], pos_args[1], pos_args[2]
-            phone_tier = pos_args[3] if len(pos_args) >= 4 else None
-            speaker_file = SpeakerFile(wav_file_path=wav_path, textgrid_file_path=tg_path,
-                                       word_tier=word_tier, phone_tier=phone_tier)
-        elif os.path.exists("pull_files_from_path.txt"):
-            speaker_file, save_path = pull_files_from_path()
-        else:
-            speaker_file = select_files()
+        speaker_file = select_files()
 
-    if speaker_file: main(speaker_file, save_path=save_path, split_utterances=True)
+    if speaker_file:
+        main(speaker_file, save_path=save_path, split_utterances=args.slice)
 
 if __name__ == "__main__":
     cli()
