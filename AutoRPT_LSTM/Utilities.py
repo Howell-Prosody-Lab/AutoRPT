@@ -267,20 +267,20 @@ class CTG:
         time_stamps = {}
 
         for idx, element in enumerate(final_dict["Prominence"]):
-            if 0.41 <= element <= 0.7:
+            if 0.41 <= element <= 0.98:
                 point = Point_Tier.point_tier_setup(final_dict["start"][idx], final_dict["end"][idx], phone_data, "Prominence")
                 time_stamps[point] = "*?"
 
-            elif 0.71 <= element <= 1:
+            elif 0.99 <= element <= 1:
                 point = Point_Tier.point_tier_setup(final_dict["start"][idx], final_dict["end"][idx], phone_data, "Prominence")
                 time_stamps[point] = "*"
 
         for idx, element in enumerate(final_dict["Boundary"]):
-            if 0.16 <= element <= 0.29:
+            if 0.175 <= element <= 0.81:
                 point = Point_Tier.point_tier_setup(final_dict["start"][idx], final_dict["end"][idx], phone_data, "Boundary")
                 time_stamps[point] = "]?"
 
-            elif 0.3 <= element <= 1:
+            elif 0.82 <= element <= 1:
                 point = Point_Tier.point_tier_setup(final_dict["start"][idx], final_dict["end"][idx], phone_data, "Boundary")
                 time_stamps[point] = "]"
 
