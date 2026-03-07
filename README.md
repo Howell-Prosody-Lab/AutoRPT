@@ -21,7 +21,7 @@ This module runs a Long Short-Term Memory (LSTM) framework and is focused on the
 
 ### Corpus and Training
 
-AutoRPT is currently trained on the **Boston University Radio Corpus**, which serves as the foundation for the tool’s prosodic annotations. As research progresses, the model will be adapted to annotate prosodic features in other varieties of English, including those spoken in New Jersey.
+AutoRPT was originally trained on the **Boston University Radio Corpus**, which serves as the foundation for the tool’s prosodic annotations. As research progresses, the model will be adapted to annotate prosodic features in other varieties of English, including those spoken in New Jersey. 
 
 ### Prosodic Event Annotation and Detection in Three Varieties of English
 
@@ -38,7 +38,7 @@ To run AutoRPT, you'll need to install several Python libraries. Follow the step
 
 ### Prerequisites
 
-1. Ensure that you have Python version 3.7 or higher. You can download the latest version of Python [here](https://www.python.org/downloads/).
+1. Ensure that you have a Python version between 3.7-3.11 inclusive. You can download Python [here](https://www.python.org/downloads/).
 2. Download and unzip a copy of the repo.
 3. It is recommended to create a virtual environment to manage the dependencies specific to AutoRPT.
 
@@ -126,7 +126,7 @@ Functions:
 * batch_process() - Runs main on whole folder of files using same logic as pull_files_from_path. No returns.
 * main(SpeakerFile s, string save_path = None, bool split_utterances=False) - Creates tiers and places prosody annotations and confidence degrees from RPT functions in them. Calls all the other main functions: Pitch.run, Intensity.run, model_join.dict_merge, CTG.create_textgrid, Point_Tier.phone_data, CTG.create_point_tier. No returns.
 
-If __main__: calls select_files to get user input, passes that input to main.
+If \_\_main__: calls select_files to get user input, passes that input to main.
 
 #### Clean_I_Model
 
@@ -142,7 +142,7 @@ Class IntensityExtraction functions:
 * getAverageIntensity(self, intensity_full: parselmouth.Intensity) - Returns arithmetic mean of intensity of a file as a float.
 
 Class FileProcessorIntensity functions:
-* __init__(self) - Runs model by itself calling IntensityExtraction().
+* \_\_init__(self) - Runs model by itself calling IntensityExtraction().
 * iterateTextGridforIntensity(self, s: SpeakerFile object, tier_type: string['word' or 'phone') - Creates array Interval_data, iterates through intervals of specified TextGrid tier, and runs calculations. Returns dict interval_data, int error_count, and array error_arr. Calls all IntensityExtraction functions.
 
 Class SpeakerNormalization functions:
@@ -198,7 +198,7 @@ N.B. For all of the below functions: interval_data is a dict mapping strings to 
 * getZScore(self, key: number, avg: float, std: float) - Takes a specific value and returns the Z-score.
 
 Class FileProcessor functions:
-* __init__(self) - Runs model by itself calling PitchExtraction()
+* \_\_init__(self) - Runs model by itself calling PitchExtraction()
 * iterateTextGridforPitch(self, s: SpeakerFile object, tier_type: string['word' or 'phone') - Creates array Interval_data, iterates through intervals of specified TextGrid tier, and runs calculations. Returns array interval_data, int error_count, and array error_arr. Calls all PitchExtraction methods.
   
 Class FormatToInterval functions:
@@ -250,13 +250,13 @@ Requires: parselmouth, pandas, re, os, traceback, textgrid
 Description: Object that contains all data relevant to a specific channel of a specific sound file. This can include the wav file, textgrid, acoustic data, annotations, and a variety of instance variables.
 
 Class SpeakerFile functions:
-* __init__(self, textgrid_file_path: string[path]=None, finaldict_file_path: string[path] = None, wav_file_path: string[path] = None, annot_filepath: string[path] = None, existing_file: string[path] = None) - Creates the object from provided arguments and derives all possible information. Calls unpack_tg_output, parse_tiers, read_regex.
+* \_\_init__(self, textgrid_file_path: string[path]=None, finaldict_file_path: string[path] = None, wav_file_path: string[path] = None, annot_filepath: string[path] = None, existing_file: string[path] = None) - Creates the object from provided arguments and derives all possible information. Calls unpack_tg_output, parse_tiers, read_regex.
 * unpack_tg_output(self, point_tier: string[name], w_no: int[index of word_tier], ph_no: int[index of phone_tier], pt_no: int[index of point tier]) Sets instance variables related to textgrids. No returns.
 * parse_tiers(self, tiers: array of strings[names]) - Scans list of available tier names given the most likely tier names. Returns the name of the last tier and the indices of the word, phone, and point tiers.
 * read_regex(self, m: match object created from a regex evaluation) - Unpacks the file naming convention into information based on regex_definition.txt. You will customize this if you're not using an identical naming convention to me. See regex explanation below.
-* __repr__(self) - returns representation
+* \_\_repr__(self) - returns representation
 * contents(self) - prints repr
-* __str__(self) - returns simple name
+* \_\_str__(self) - returns simple name
 * has_annotation_log(self): checker for instance variables implying annotation log exists. Returns boolean.
 * has_final_dict(self): checker for filepath of final_dict (acoustic measures). Returns boolean.
 * has_wav(self): checker for wav file object. Returns boolean.
@@ -265,8 +265,8 @@ Class SpeakerFile functions:
 * add_final_dict(self, final_dict_filepath: string[path]) - Adds an acoustic dictionary as created by AutoRPT to the object as a pandas dataframe. No returns.
 * add_textgrid(self, textgrid_file_path: string[path]) - Adds a TextGrid.textgrid object to the file. Unlike logs, textgrid is added by reference and path must remain valid through the lifetime. No returns.
 * add_wav(self, wav_file_path: string[path]) - Adds a parselmouth Sound object to the file. Unlike logs, sound file is added by reference and path must remain valid through the lifetime. No returns.
-* __getstate__(self) - Copy the object's state from self.__dict__. Returns dictionary containing picklable instance variables.
-* __setstate__(self, state: dictionary) - Restores instance variables from pickled state.
+* \_\_getstate__(self) - Copy the object's state from self.\_\_dict__. Returns dictionary containing picklable instance variables.
+* \_\_setstate__(self, state: dictionary) - Restores instance variables from pickled state.
 * read_from_txt/read_from_txt2/write_to_txt I'm trying to make a function that can instantiate a SpeakerFile object from a text file (and one that will save to it) instead of a pickle object (for backup and human readability) and it's not going well.
 
 ### Regular expressions and file naming conventions
@@ -274,18 +274,36 @@ SpeakerFile operates on the assumption that the way you name your files a) is re
 
 We have two naming conventions (two different lab groups looking at two different sets of priorities) for the base files as recorded, known as MMT1 and MMT2.
 #### MMT1 
-Example: 1234p01mx01ab02cd.
-Breakdown: 1234 p01 mx 01ab 02cd
-Grant number (4 digits), pairing number (p followed by 2 digits), genders of participants in order from left to right/channel 1 to channel 2 (1 letter each), participant ID for left speaker/channel 1 (2 digits followed by 2 letters), participant ID for right speaker/channel 2 (2 digits followed by 2 letters)
+Example: 1234p01mx01ab02cd.  
+Breakdown: 1234 p01 mx 01ab 02cd. Grant number (4 digits), pairing number (p followed by 2 digits), genders of participants in order from left to right/channel 1 to channel 2 (1 letter each), participant ID for left speaker/channel 1 (2 digits followed by 2 letters), participant ID for right speaker/channel 2 (2 digits followed by 2 letters)
 #### MMT2
-Example: 1234-p01-l-ff
-Breakdown:
-Grant number (4 digits), pairing number (p followed by 2 digits), language variety (1 letter), genders of participants in order from left to right/channel 1 to channel 2 (1 letter each)
+Example: 1234-p01-l-ff.  
+Breakdown: Grant number (4 digits), pairing number (p followed by 2 digits), language variety (1 letter), genders of participants in order from left to right/channel 1 to channel 2 (1 letter each)
 #### Additional tags
-Either of these can then be tagged with channel, annotator name, or file version (because we don't always ask people to annotate the entire file). SpeakerFile requires that we tag with channel; the rest are optional. 
+Either of these can then be tagged with channel, annotator name, and/or file version (because we don't always ask people to annotate the entire file). SpeakerFile requires that we tag with channel; the rest are optional. 
 
-Unfortunately, different annotators have gotten in the habit of using different ways of tagging the channel, all of which are very human-readable, but which are tricky to write a regular expression for.
 #### so yeah
 This results in a regular expression looking for (in English): grant number, pairing number, language variety (optional), left gender, right gender, left speaker ID (optional), right speaker ID (optional), version (optional), channel, annotator (optional), file extension. 
 
-In regex, once capture groups have been added, this is 345 characters long, wholly not human-readable, and it is a huge ask to have someone modify it. So instead, I made a text file breaking down the regex roughly as I just broke it down for you, and wrote in code to read it and turn it into that 345-char-long string. That code is in __init__. The code that turns what the regular expression _found_ into instance variables is in read_regex(self, m). Instead of having to figure out the entire regex, you can break it down into parts, and you only have to know the expression for each piece you need. The code takes care of attaching the capture group name and parentheses and marking whether it's optional.
+In regex, once capture groups have been added, this is 345 characters long, wholly not human-readable, and it is a huge ask to have someone modify it. So instead, I made a text file breaking down the regex roughly as I just broke it down for you, and wrote in code to read it and turn it into that 345-char-long string. That code is in \_\_init__. The code that turns what the regular expression _found_ into instance variables is in read_regex(self, m). Instead of having to figure out the entire regex, you can break it down into parts, and you only have to know the expression for each piece you need. The code takes care of attaching the capture group name and parentheses and marking whether it's optional.  
+
+The regex_definition text file looks like this:  
+grant_number&emsp;	required&emsp;	[0-9]{4}  
+pairing_number&emsp;	required&emsp;	-?p[0-9]{2}  
+race&emsp;	optional&emsp;	-[A-Za-z][A-Za-z]?      
+
+So what you're going to do is break every piece of the file naming convention apart and come up with a name (no spaces). That goes in column 1. Tab, then put required or optional. Tab again, the regular expression for just that piece. Then what the \_\_init__ code does is go, "Oh, a four digit regex, cool, wrap that in parentheses and name the capture group grant_number. A p with two digits, optionally following a dash? Wrap in parentheses and name the capture group pairing_number. A dash followed by a letter and an optional second letter? Wrap in parentheses and name the capture group race. Oh, but it's optional? Tack a question mark on the end of it. Glue all these things together, that's the regular expression. Search for the pattern in the file name and send the resulting object to read_regex."  
+
+What this does is save you a whole bunch of counting parentheses and figuring out where exactly your question marks go in a way that's human-readable. It lets you change one piece of the file naming convention without having to edit the whole thing. And if you make a mistake, it doesn't propagate through the whole expression.  
+#### read_regex
+You'll also need to edit read_regex to unpack everything. You don't necessarily want to store channel as _1, you might want to store it as 'left'. So read_regex cleans up the extra dashes and underscores, translates abbreviations into instance variable-worthy text, and sets the instance variables. There are a lot of comments in read_regex to guide you through the process of customizing it. The first thing the function does is call match.groupdict(), which lets you access every variable you put in regex_definition.txt from a simple dictionary mapping the capture group name to its value. You can also do this with integer indices calling match.groups(int), but then you need to know exactly how many variables you're going to have and in which order, which you won't if you have any optional ones. Using a dictionary allows you to check on the optional variables--they will still be keys in the dictionary, but their value will be None. You'll assign those instance variables by wrapping them in an if statement to check they exist first. 
+```python
+#some variables need cleaning up--this one has a -p in front we don't need
+ self.pairing_number = vars['pairing_number'][-2:]
+
+#optional variables need to be nested in an if statement
+if vars['version']: #if version is not None
+      self.version = vars['version'][1:]
+      #then chop off the - and push to self.version
+```
+It's also just more human-readable by a long shot to access by name instead of index. The only time the function uses match.groups is match.groups(0), which gets the entire capture as a single string.
