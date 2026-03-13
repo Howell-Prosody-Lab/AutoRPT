@@ -1,12 +1,12 @@
 import os
 import traceback
-import textgrid
+import tgt
 import re
 import pandas as pd
 
 class SpeakerFile:
 
-    def __init__(self, textgrid_file_path=None, finaldict_file_path=None, wav_file_path=None, annot_filepath=None, existing_file=None):
+    def __init__(self, textgrid_file_path=None, finaldict_file_path=None, wav_file_path=None, annot_filepath=None, existing_file=None, word_tier=None, phone_tier=None):
         '''
         Creates the SpeakerFile object using at least one of the keyword arguments. Extrapolates what other
         information is available from the files/file names and saves.
@@ -22,6 +22,11 @@ class SpeakerFile:
             self.file_version = "Regular"
             self.rpt_status = self.word_tier = self.word_tier_no = self.phone_tier = self.phone_tier_no = "Unknown"
             self.point_tier = self.point_tier_no = self.ideal_word_tier = self.ideal_phone_tier = "Unknown"
+            self.variety = "Unknown"
+            if word_tier:
+                self.word_tier = word_tier
+            if phone_tier:
+                self.phone_tier = phone_tier
             self.finaldict_filepath = self.final_dict = None
             self.annotations = self.annotator = self.annotations_filepath = None
             self.wav_filepath = self.textgrid_filepath = all_tiers = None
@@ -36,6 +41,21 @@ class SpeakerFile:
             #Converting regex_definition into a single regular expression
             #This is done because the raw regex looks like this: (?P<grant_number>[0-9]{4})(?P<pairing_number>-?p[0-9]{2})(?P<race>-[A-Za-z][A-Za-z]?)?(?P<left_gender>-?[A-Za-z])(?P<right_gender>[A-Za-z])(?P<left_speaker_ID>[0-9]{2}[A-Za-z]{2})?(?P<right_speaker_ID>[0-9]{2}[A-Za-z]{2})?(?P<version>_[A-Za-z]+[0-9]?)?(?P<channel>[-_]([cC]h)?[12lLrR])(?P<annotator>[-_][A-Za-z]+)?(?P<file_extension>\.[A-Za-z]+)
             #Leave this part alone. You'll edit regex_definition.txt and read_regex() to customize.
+            if not os.path.exists("regex_definition.txt"):
+                with open("regex_definition.txt", "w") as f:
+                    f.write(r"""grant_number	required	[0-9]{4}
+pairing_number	required	-?p[0-9]{2}
+race	optional	-[A-Za-z][A-Za-z]?
+left_gender	required	-?[A-Za-z]
+right_gender	required	[A-Za-z]
+left_speaker_ID	optional	[0-9]{2}[A-Za-z]{2}
+right_speaker_ID	optional	[0-9]{2}[A-Za-z]{2}
+version	optional	_[A-Za-z]+[0-9]?
+channel	required	[-_]([cC]h)?[12lLrR]
+annotator	optional	[-_][A-Za-z]+
+file_extension	required	\.[A-Za-z]+
+""")
+                print('created regex_definition.txt in the current working directory')
             regex_def = pd.read_csv("regex_definition.txt", sep='\t', header=None)
             regex = r""
             for i, row in regex_def.iterrows():
@@ -47,8 +67,8 @@ class SpeakerFile:
                 regex += (')')
                 if row[1] == 'optional':
                     regex += '?'
-            format_recognized = True  # true until proven false
-            m = re.search(regex, s)
+            format_recognized = True
+            m = re.search(regex, string_to_search)
             if m:
                 self.read_regex(m)
             else:
@@ -73,7 +93,7 @@ class SpeakerFile:
             if textgrid_file_path:
                 try:
                     self.add_textgrid(textgrid_file_path)
-                    all_tiers = self.textgrid_obj.getNames()
+                    all_tiers = self.textgrid_obj.get_tier_names()
                     #print("Success")
                 except AttributeError:
                     print(textgrid_file_path, "isn't a textgrid.")
@@ -100,9 +120,15 @@ class SpeakerFile:
             else:
                 w_no = ph_no = word_tier = phone_tier = pt_no = point_tier = None
             if not format_recognized:
-                print("\nThis file name or tier name does not match a recognized format. Enter tiers manually.")
-                self.word_tier = input("Enter the word tier name in the TextGrid: ")
-                self.phone_tier = input("Enter the phone tier name in the TextGrid: ")
+                stem = os.path.splitext(os.path.basename(first_existing_path))[0]
+                self.base_filename = stem
+                self.name_with_channel = stem
+                self.name_with_channel_and_version = stem
+                if self.word_tier == "Unknown":
+                    print("\nThis file name or tier name does not match a recognized format. Enter tiers manually.")
+                    self.word_tier = input("Enter the word tier name in the TextGrid: ")
+                if self.phone_tier == "Unknown":
+                    self.phone_tier = input("Enter the phone tier name in the TextGrid: ")
 
 
     #Methods that are basically part of init
@@ -130,7 +156,9 @@ class SpeakerFile:
         '''
         print("Parsing tiers...")
         print(tiers)
-        if self.ideal_word_tier in tiers:
+        if self.word_tier not in ("Unknown", None) and self.word_tier in tiers:
+            pass  # already set from constructor argument; preserve it
+        elif self.ideal_word_tier in tiers:
             self.word_tier = self.ideal_word_tier
             self.rpt_status = "not AutoRPT"
         elif "Text" in tiers:
@@ -138,7 +166,9 @@ class SpeakerFile:
             self.rpt_status = "AutoRPT"
         else:
             self.word_tier = input(f"No word tier found (expecting {self.ideal_word_tier}). Enter word tier: ")
-        if self.ideal_phone_tier in tiers:
+        if self.phone_tier not in ("Unknown", None) and self.phone_tier in tiers:
+            pass  # already set from constructor argument; preserve it
+        elif self.ideal_phone_tier in tiers:
             self.phone_tier = self.ideal_phone_tier
         elif 'phone' in tiers:
             self.phone_tier = 'phone'
@@ -162,7 +192,7 @@ class SpeakerFile:
         :return: none
         '''
         vars = m.groupdict() #dictionary mapping capture group names (k) to values
-        whole_capture = m.groups(0)
+        whole_capture = str(m.group(0))
 
         #some variables need cleaning up--this one has a -p in front we don't need
         self.pairing_number = vars['pairing_number'][-2:]
@@ -225,8 +255,8 @@ class SpeakerFile:
         #different types of file names have different tier naming conventions too.
         #if MMT1--"if left_speaker_ID and right_speaker_ID exist"
         if vars['left_speaker_ID'] and vars['right_speaker_ID']:
-            self.ideal_word_tier = speakerID + ' - words'
-            self.ideal_phone_tier = speakerID + ' - phones'
+            self.ideal_word_tier = self.speakerID + ' - words'
+            self.ideal_phone_tier = self.speakerID + ' - phones'
             base_filename_end = m.end('right_speaker_ID') #also the "base" name ends in a different place
         else: #if MMT2
             if self.channel == "left":
@@ -395,8 +425,8 @@ class SpeakerFile:
         self.textgrid_filepath = textgrid_file_path
         # summon textgrid files from package
         try:
-            self.textgrid_obj = textgrid.TextGrid.fromFile(textgrid_file_path)
-            all_tiers = [t.name for t in self.textgrid_obj.tiers]
+            self.textgrid_obj = tgt.io.read_textgrid(textgrid_file_path)
+            all_tiers = self.textgrid_obj.get_tier_names()
             #you'd think this could be done in one line but "missing 5 required positional arguments"
             point_tier, w_no, ph_no, pt_no = self.parse_tiers(all_tiers)
             self.unpack_tg_output(point_tier, w_no, ph_no, pt_no)
@@ -518,7 +548,7 @@ class SpeakerFile:
                 cls.wav_filepath = None
 
             if cls.textgrid_filepath and os.path.exists(cls.textgrid_filepath):
-                cls.textgrid_obj = textgrid.TextGrid.fromFile(cls.textgrid_filepath)
+                cls.textgrid_obj = tgt.io.read_textgrid(cls.textgrid_filepath)
 
             if cls.finaldict_filepath and os.path.exists(cls.finaldict_filepath):
                 cls.final_dict = pd.read_csv(cls.finaldict_filepath)

@@ -13,15 +13,16 @@ from praatio import textgrid
 
 #Add the current directory to sys.path
 import sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+#sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-import Clean_I_Model
-import Clean_P_Model
-import Utilities
-from SpeakerFile import *
-from Utilities import *
-from Clean_P_Model import Pitch
-from Clean_I_Model import Intensity
+#import .Clean_I_Model
+#import .Clean_P_Model
+#import .Utilities
+#import .SpeakerFile
+from .SpeakerFile import *
+from .Utilities import *
+from .Clean_P_Model import Pitch
+from .Clean_I_Model import Intensity
     
 
 def select_tiers(all_tiers):
@@ -205,7 +206,7 @@ def main(s, save_path = None, split_utterances=False):
     mto_csv(data=printable,csv_file=filepath)
 
     if split_utterances:
-        import sliceUtterances
+        from . import sliceUtterances
         print("Splitting utterances...")
         sliced_save_path = os.path.join(save_path, "sliced-utterance-output", s.variety)
         sliceUtterances.just_one_moneypenney(s.wav_filepath, s.textgrid_filepath,
@@ -214,13 +215,45 @@ def main(s, save_path = None, split_utterances=False):
 
     print("Operation complete.")
 
-if __name__ == "__main__":
-    """
-    Only one of these two should be uncommented at a time. See descriptions of methods to pick one.
-    """
-    #speaker_file = select_files()
-    speaker_file, save_path = pull_files_from_path()
+def cli():
+    import argparse
 
-    """Only one of these two should be uncommented at a time."""
-    if speaker_file: main(speaker_file, save_path=save_path, split_utterances=True)
-    #batch_process()
+    parser = argparse.ArgumentParser(
+        prog='autorpt',
+        description='AutoRPT LSTM - Automatic Rapid Prosody Transcription',
+        epilog='You may also create a file "pull_files_from_path.txt" to pull arguments from instead of the command line.'
+    )
+
+    parser.add_argument('wav', nargs='?', help='Path to the WAV file')
+    parser.add_argument('textgrid', nargs='?', help='Path to the TextGrid file')
+    parser.add_argument('word_tier', nargs='?', default=None, help='Name of the word tier (optional, will prompt if not provided)')
+    parser.add_argument('phone_tier', nargs='?', default=None, help='Name of the phone tier (optional, will prompt if not provided)')
+
+    parser.add_argument('--batch', action='store_true', help='Batch process multiple files')
+    parser.add_argument('--select', action='store_true', help='Manually select files/tiers with a file selector')
+    parser.add_argument('--slice', action='store_true', help='Apply utterance slicing with ffmpeg')
+
+    args = parser.parse_args()
+
+    save_path = None
+    speaker_file = None
+
+    if args.batch:
+        batch_process()
+        return
+
+    if args.select:
+        speaker_file = select_files()
+    elif args.wav and args.textgrid:
+        speaker_file = SpeakerFile(wav_file_path=args.wav, textgrid_file_path=args.textgrid,
+                                   word_tier=args.word_tier, phone_tier=args.phone_tier)
+    elif os.path.exists("pull_files_from_path.txt"):
+        speaker_file, save_path = pull_files_from_path()
+    else:
+        speaker_file = select_files()
+
+    if speaker_file:
+        main(speaker_file, save_path=save_path, split_utterances=args.slice)
+
+if __name__ == "__main__":
+    cli()
