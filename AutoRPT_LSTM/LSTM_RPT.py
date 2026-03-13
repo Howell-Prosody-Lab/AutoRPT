@@ -23,6 +23,14 @@ from .SpeakerFile import *
 from .Utilities import *
 from .Clean_P_Model import Pitch
 from .Clean_I_Model import Intensity
+
+
+import spacy.util
+
+if not spacy.util.is_package("en_core_web_sm"):
+    raise RuntimeError(
+        "Required spaCy model not found. Run: python -m spacy download en_core_web_sm"
+    )
     
 
 def select_tiers(all_tiers):

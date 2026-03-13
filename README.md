@@ -1,8 +1,19 @@
-
----
 # AutoRPT: Automatic Rapid Prosody Transcription Tool
 
 **AutoRPT** is a Python command-line tool designed to automatically annotate prosodic features following the Rapid Prosody Transcription (RPT) protocol. It is currently trained on Standard American English (SAE), with future updates planned to include other language varieties.
+
+## Installation Instructions
+
+You can install the tool using pip
+`pip install praat-autorpt`
+
+Alternatively, can find the latest release in the releases tab. Download the wheel, navigate to the file in your terminal, and install it with `pip install praat_autorpt-x.x.x-py3-none-any.whl`.
+
+Before running, install the SpacY model pipeline.
+```bash
+python -m spacy download en_core_web_sm
+```
+Afterwards, you will then be able to run `autorpt` from the command line.
 
 ### About the Project
 
@@ -33,12 +44,9 @@ AutoRPT is part of ongoing research into the detection of prosodic events across
 
 ---
 
-## Installation Instructions
-You can find the latest release in the releases tab. Download the wheel, navigate to the file in your terminal, and install it with `pip install praat_autorpt-x.x.x-py3-none-any.whl` 
-
 ## Build Instructions
 
-To run AutoRPT, you'll need to install several Python libraries. Follow the steps below to set up the tool on your system.
+To build AutoRPT, you'll need to install several Python libraries. Follow the steps below to set up the tool on your system.
 
 ### Prerequisites
 
@@ -68,20 +76,20 @@ Navigate to the directory containing the AutoRPT folder (this may be in your Dow
 You can install the required dependencies by running:
 
 ```bash
-pip install -r requirements.txt
+pip install -e .
 ```
 
-This command will install all the necessary Python packages listed in the `requirements.txt` file.
+This command will install all the necessary Python packages listed in the `pyproject.toml` file.
 
 #### Required Python Packages
 
 The key dependencies for AutoRPT are:
 
 1. **Praat-ParselMouth**: A Python interface to Praat for conducting phonetic analyses.
-2. **TextGrid**: A library used to handle Praat TextGrid objects for annotating speech.
+2. **TextGridTools**: A library used to handle Praat TextGrid objects for annotating speech.
 3. **Scikit-learn**: A widely-used library for machine learning tasks such as classification and regression.
 4. **Pandas**: A powerful data manipulation and analysis library.
-5. **PyTorch**: An open-source deep learning framework, used for building and training machine learning models.
+5. **Tensorflow**: An open-source deep learning framework, used for building and training machine learning models.
 
 #### Model Pipeline
 Install the SpacY model pipeline.
@@ -103,14 +111,14 @@ We recommend that you use the most recent version of the trained models for LSTM
 Navigate into the folder with the main file.
 e.g.
 ```bash
-cd AutoRPT-main/AutoRPT-main/AutoRPT_LSTM
+cd AutoRPT
 ```
 You can then run AutoRPT with the following commands:
 
 ```bash
-python LSTM_RPT.py
+python -m AutoRPT_LSTM.LSTM_RPT [wav] [textgrid]
 ```
-A file selection window will appear prompting you to select your TextGrid file. Select a file and press Open. Another selection window will appear prompting you to select a WAV file. Select a file and press Open.
+If you do not manually provide paths to an audio file and a textgrid file, a file selection window will appear prompting you to select your TextGrid file. Select a file and press Open. Another selection window will appear prompting you to select a WAV file. Select a file and press Open.
 
 Return to the command line or terminal and follow the instructions. 
 AutoRPT will then start processing and annotating prosodic features based on the input data.
