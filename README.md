@@ -32,7 +32,11 @@ AutoRPT is part of ongoing research into the detection of prosodic events across
 - **Latine English (LE)** 
 
 ---
+
 ## Installation Instructions
+You can find the latest release in the releases tab. Download the wheel, navigate to the file in your terminal, and install it with `pip install praat_autorpt-x.x.x-py3-none-any.whl` 
+
+## Build Instructions
 
 To run AutoRPT, you'll need to install several Python libraries. Follow the steps below to set up the tool on your system.
 
