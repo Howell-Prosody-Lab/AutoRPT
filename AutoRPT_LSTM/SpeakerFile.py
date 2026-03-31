@@ -22,7 +22,7 @@ class SpeakerFile:
             self.file_version = "Regular"
             self.rpt_status = self.word_tier = self.word_tier_no = self.phone_tier = self.phone_tier_no = "Unknown"
             self.point_tier = self.point_tier_no = self.ideal_word_tier = self.ideal_phone_tier = "Unknown"
-            self.variety = "Unknown"
+            self.variety = self.channel = self.pairing_number = self.speakerID = self.gender = "Unknown"
             if word_tier:
                 self.word_tier = word_tier
             if phone_tier:
