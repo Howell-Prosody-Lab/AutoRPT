@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "praat-autorpt"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
   { name="Seth Heiney", email="sheiney00@gmail.com" },
   { name="Thomas Hicks", email="hicksthomas465@gmail.com" },
@@ -16,7 +16,7 @@ authors = [
 ]
 description = "Command-line tool for annotating prosodic features"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10,<3.13"
 dependencies = [
     "praat-parselmouth>=0.3.3",
     "textgrid>=1.5",

@@ -11,6 +11,7 @@ from pprint import pprint
 import csv
 import tkinter as tk
 from tkinter import filedialog
+import scipyio.wavfile as wav
 
 class Utterance:
     end = 1000000000
@@ -103,19 +104,16 @@ def sliceAudio(audiofile, start, end, output):
   #   str end, path-like string output
   # Returns: none. Outputs .wav files.
   """
-  length = end-start
   if os.path.isfile(output):
     os.remove(output)
-    
-  command = [
-      'ffmpeg',
-      '-i', audiofile,
-      '-ss', str(start),  
-      '-t', str(length),
-      output           # Output
-  ]
 
-  subprocess.run(command, check=True)
+  sample_rate, data = wav.read(audiofile)
+  start_sample = int(start * sample_rate)
+  end_sample = start_sample + int(length * sample_rate)
+
+  sliced_data = data[start_sample:end_sample]
+
+  wav.write(output, sample_rate, sliced_data)
   
 def pad(i, length):
     #takes a number as a string and sees if it has enough leading zeros to be sortable
