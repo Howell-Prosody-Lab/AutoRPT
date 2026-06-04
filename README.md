@@ -99,7 +99,7 @@ python -m spacy download en_core_web_sm
 
 ### Step 3: Install the trained models
 
-We recommend that you use the most recent version of the trained models for LSTM, which can be found at [the top level of this repo](https://github.com/Howell-Prosody-Lab/rpt-training/tree/main). As mentioned before, the model in this current (AutoRPT) repo is trained on the Boston University Radio News Corpus. The models in the linked repo are trained on the annotated corpus collected as part of this project. The new models have labeled as "_updated" to differentiate.
+We recommend that you use the most recent version of the trained models for LSTM, which can be found at [the top level of this repo](https://github.com/Howell-Prosody-Lab/rpt-training/tree/main). As mentioned before, the model in this current (AutoRPT) repo is trained on the Boston University Radio News Corpus. The models in the linked repo are trained on the annotated corpus collected as part of this project. The new models have labeled as "_updated" to differentiate. There is also a version without parts of speech if you wish to use that. It is labeled with _no_pos.
 1. Go to the AutoRPT-main/AutoRPT-main/AutoRPT_LSTM/Model_paths that is now on your computer.
 2. Delete the files out of it.
 3. Download the models from the provided link.
