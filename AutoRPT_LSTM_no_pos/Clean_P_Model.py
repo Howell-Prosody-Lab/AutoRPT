@@ -418,6 +418,8 @@ class Saved_Model:
             # Load the new CSV data
             df = pd.read_csv(csv_file, header=0)  # Assumes first row is header
 
+        # If the POS column is missing it'll throw an out of bounds error. So for now it's being hard coded in as all 0s.
+        # Just cause the model was trained with POS being in there.
             if df.shape[1] < 11:
                 df.insert(10, "POS ID's", 0)
 
